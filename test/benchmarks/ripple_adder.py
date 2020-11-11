@@ -46,22 +46,30 @@ class RippleAdderTranspile:
         self.sim_backend = QasmSimulatorPy()
         self.circuit = build_ripple_adder_circuit(size)
 
-    def time_transpile_simulator_ripple_adder(self, _, level):
-        transpile(self.circuit, self.sim_backend,
-                  optimization_level=level)
+    # def time_transpile_simulator_ripple_adder(self, _, level):
+    #     transpile(self.circuit, self.sim_backend,
+    #               optimization_level=level)
+    #
+    # def track_depth_transpile_simulator_ripple_adder(self, _, level):
+    #     return transpile(self.circuit, self.sim_backend,
+    #                      optimization_level=level).depth()
+    #
+    # def time_transpile_square_grid_ripple_adder(self, _, level):
+    #     transpile(self.circuit,
+    #               coupling_map=self.coupling_map,
+    #               basis_gates=['u1', 'u2', 'u3', 'cx', 'id'],
+    #               optimization_level=level)
+    #
+    # def track_depth_transpile_square_grid_ripple_adder(self, _, level):
+    #     return transpile(self.circuit,
+    #                      coupling_map=self.coupling_map,
+    #                      basis_gates=['u1', 'u2', 'u3', 'cx', 'id'],
+    #                      optimization_level=level).depth()
 
-    def track_depth_transpile_simulator_ripple_adder(self, _, level):
-        return transpile(self.circuit, self.sim_backend,
-                         optimization_level=level).depth()
-
-    def time_transpile_square_grid_ripple_adder(self, _, level):
-        transpile(self.circuit,
-                  coupling_map=self.coupling_map,
-                  basis_gates=['u1', 'u2', 'u3', 'cx', 'id'],
-                  optimization_level=level)
-
-    def track_depth_transpile_square_grid_ripple_adder(self, _, level):
-        return transpile(self.circuit,
-                         coupling_map=self.coupling_map,
-                         basis_gates=['u1', 'u2', 'u3', 'cx', 'id'],
-                         optimization_level=level).depth()
+    def track_cnot_counts_after_mapping_ripple_adder_to_square_grid_sabre(self, *unused):
+        circuit = transpile(self.circuit, basis_gates=['u1', 'u3', 'u2', 'cx'],
+                            coupling_map=self.coupling_map, seed_transpiler=0,
+                            routing_method="sabre")
+        counts = circuit.count_ops()
+        cnot_count = counts.get('cx', 0)
+        return cnot_count
